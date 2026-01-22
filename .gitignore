@@ -1,0 +1,45 @@
+#Swift files
+.DS_Store
+/.build
+/Packages
+xcuserdata/
+DerivedData/
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc
+.swiftpm
+
+#JS files
+node_modules/
+generated/
+ios-addons/
+mac-addons/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn
+package-lock.json
+yarn.lock
+
+
+# Generated bundles and frameworks
+# iOS resources - distributed via GitHub releases
+Sources/WdkSwiftCore/Resources/
+*.xcframework
+*.framework
+
+# macOS testing resources - generated locally
+Tests/Resources/
+Tests/**/*.bundle
+Tests/**/*.framework
+
+# BareKit framework for testing
+Frameworks/
+BareKit.xcframework
+Frameworks/
+BareKit.framework
+
+# Release artifacts
+prebuilds/
+prebuilds.zip
