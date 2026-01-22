@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process')
+const link = require('bare-link')
 const path = require('path')
 
 // Parse command line arguments
@@ -53,26 +53,33 @@ const { hosts, outDir, displayName } = config
 
 console.log(`🔗 Linking Bare addons for ${displayName}...\n`)
 
-for (const module of bareModules) {
-  const modulePath = path.join('node_modules', module)
-  
-  try {
-    console.log(`  Linking ${module}...`)
+async function linkModules() {
+  for (const module of bareModules) {
+    const modulePath = path.join('node_modules', module)
     
-    const hostsArgs = hosts.map(h => `--host ${h}`).join(' ')
-    const command = `npx bare-link ${hostsArgs} --out ${outDir} ${modulePath}`
-    
-    execSync(command, { 
-      stdio: 'inherit',
-      cwd: process.cwd()
-    })
-    
-    console.log(`  ✅ ${module} linked successfully\n`)
-  } catch (error) {
-    console.error(`  ❌ Failed to link ${module}:`, error.message)
-    process.exit(1)
+    try {
+      console.log(`  Linking ${module}...`)
+      
+      // Use bare-link API directly
+      for await (const resource of link(modulePath, { 
+        hosts,
+        out: outDir
+      })) {
+        // Resource is processed by bare-link
+      }
+      
+      console.log(`  ✅ ${module} linked successfully\n`)
+    } catch (error) {
+      console.error(`  ❌ Failed to link ${module}:`, error.message)
+      process.exit(1)
+    }
   }
+
+  console.log(`✨ All Bare addons linked successfully for ${displayName}!`)
+  console.log(`📍 Location: ${outDir}/`)
 }
 
-console.log(`✨ All Bare addons linked successfully for ${displayName}!`)
-console.log(`📍 Location: ${outDir}/`)
+linkModules().catch(error => {
+  console.error('❌ Fatal error:', error)
+  process.exit(1)
+})
