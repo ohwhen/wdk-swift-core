@@ -10,25 +10,15 @@ public class WdkSwiftCore {
     private let requestIdQueue = DispatchQueue(label: "com.wdk.requestId")
     private var isWorkletStarted = false
     private let bundleName: String
-    private let bundlePath: String?
     
     // Read buffer for framing (accessed sequentially via async/await)
     private var readBuffer = Data()
     
     /// Initialize WdkSwiftCore
-    /// - Parameters:
-    ///   - bundleName: Name of the worklet bundle (default: platform-specific - "wdk-worklet.macos" on macOS, "wdk-worklet.mobile" on iOS)
-    ///   - bundlePath: Optional explicit path to the bundle. If provided, this takes precedence over auto-detection.
-    public init(bundleName: String? = nil, bundlePath: String? = nil) {
+    /// - Parameter bundleName: Name of the worklet bundle (default: "wdk-worklet.mobile")
+    public init(bundleName: String = "wdk-worklet.mobile") {
         self.worklet = Worklet()
-        
-        // Use platform-specific default bundle name if not provided
-        #if os(macOS)
-        self.bundleName = bundleName ?? "wdk-worklet.macos"
-        #else
-        self.bundleName = bundleName ?? "wdk-worklet.mobile"
-        #endif
-        self.bundlePath = bundlePath
+        self.bundleName = bundleName
     }
     
     deinit {
@@ -36,54 +26,12 @@ public class WdkSwiftCore {
         worklet.terminate()
     }
     
-    /// Get the bundle path using 3-tier lookup:
-    /// 1. Explicit bundlePath parameter (highest priority)
-    /// 2. Auto-detect in Bundle.main (for consumer custom bundles)
-    /// 3. Fallback to module/test bundles
-    private func getBundlePath() -> String? {
-        // 1. Use explicit path if provided
-        if let explicitPath = bundlePath {
-            return explicitPath
-        }
-        
-        // 2. Check main app bundle (for custom bundles in consumer apps)
-        if let mainPath = Bundle.main.path(forResource: bundleName, ofType: "bundle") {
-            return mainPath
-        }
-        
-        // 3. Check module bundle or test directory
-        #if os(macOS)
-        // For testing: check Tests/Resources/macos/ directory
-        let testPath = FileManager.default.currentDirectoryPath
-            + "/Tests/Resources/macos/\(bundleName).bundle"
-        if FileManager.default.fileExists(atPath: testPath) {
-            return testPath
-        }
-        #else
-        // For iOS: use Bundle.module
-        if let modulePath = Bundle.module.path(forResource: bundleName, ofType: "bundle") {
-            return modulePath
-        }
-        #endif
-        
-        return nil
-    }
-    
     /// Ensures the worklet and IPC are initialized
     private func ensureWorkletStarted() async throws {
         guard !isWorkletStarted else { return }
         
-        // Get bundle path using 3-tier lookup
-        guard let fullPath = getBundlePath() else {
-            throw WDKError.bundleNotFound("Bundle not found: \(bundleName)")
-        }
-        
-        // Extract directory from full path
-        let bundleURL = URL(fileURLWithPath: fullPath)
-        let directory = bundleURL.deletingLastPathComponent().path
-        
-        // Start the worklet with explicit directory so BareKit can find addons relative to bundle
-        worklet.start(name: bundleName, ofType: "bundle", inDirectory: directory)
+        // Start the worklet
+        worklet.start(name: bundleName, ofType: "bundle")
         
         // Give worklet time to initialize (500ms)
         try await Task.sleep(nanoseconds: 500_000_000)
