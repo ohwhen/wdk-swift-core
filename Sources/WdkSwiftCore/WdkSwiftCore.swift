@@ -10,15 +10,21 @@ public class WdkSwiftCore {
     private let requestIdQueue = DispatchQueue(label: "com.wdk.requestId")
     private var isWorkletStarted = false
     private let bundleName: String
+    private let bundle: Bundle
     
     // Read buffer for framing (accessed sequentially via async/await)
     private var readBuffer = Data()
     
     /// Initialize WdkSwiftCore
-    /// - Parameter bundleName: Name of the worklet bundle (default: "wdk-worklet.mobile")
-    public init(bundleName: String = "wdk-worklet.mobile") {
+    /// - Parameters:
+    ///   - bundleName: Name of the worklet bundle (default: "wdk-worklet.mobile").
+    ///                 This should match the filename of the .bundle resource without extension.
+    ///   - bundle: The Bundle where the worklet .bundle file is located (default: .main).
+    ///             Pass a custom Bundle if loading from a framework, test target, or app extension.
+    public init(bundleName: String = "wdk-worklet.mobile", bundle: Bundle = .main) {
         self.worklet = Worklet()
         self.bundleName = bundleName
+        self.bundle = bundle
     }
     
     deinit {
@@ -30,8 +36,8 @@ public class WdkSwiftCore {
     private func ensureWorkletStarted() async throws {
         guard !isWorkletStarted else { return }
         
-        // Start the worklet
-        worklet.start(name: bundleName, ofType: "bundle")
+        // Start the worklet from the configured bundle
+        worklet.start(name: bundleName, ofType: "bundle", inBundle: bundle)
         
         // Give worklet time to initialize (500ms)
         try await Task.sleep(nanoseconds: 500_000_000)
