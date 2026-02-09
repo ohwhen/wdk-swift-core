@@ -10,16 +10,16 @@ Supported networks: Ethereum, Polygon, Arbitrum, Sepolia, Solana, and ERC-4337.
 
 In Xcode: **File > Add Package Dependencies** and enter this repository URL.
 
-This automatically downloads the Swift API and all 17 required native addon frameworks via SPM. No manual framework management needed for the addons.
+This gives you the `WdkSwiftCore` Swift API.
 
-### Step 2 -- Download Prebuilds
+### Step 2 -- Download Release Artifacts
 
-Download `prebuilds.zip` from the [latest release](../../releases/latest) and unzip it. It contains:
+Download `prebuilds.zip` and `addons.zip` from the [latest release](https://github.com/claudiovb/pear-wrk-wdk-jsonrpc/releases/latest).
 
-| File | What it is |
-|------|-----------|
-| `BareKit.xcframework` | The Bare runtime that executes the JavaScript worklet |
-| `wdk-worklet.mobile.bundle` | The WDK worklet containing wallet logic |
+| File | Contents |
+|------|----------|
+| `prebuilds.zip` | `BareKit.xcframework` (runtime) + `wdk-worklet.mobile.bundle` (worklet) |
+| `addons.zip` | 17 native addon xcframeworks required by the Bare runtime |
 
 ### Step 3 -- Add to Xcode Project
 
@@ -27,7 +27,11 @@ Download `prebuilds.zip` from the [latest release](../../releases/latest) and un
 
 2. **wdk-worklet.mobile.bundle** -- Drag into your Xcode project navigator. Ensure it appears in your target's **Build Phases > Copy Bundle Resources**.
 
-That's it. Build and run.
+3. **17 addon xcframeworks** -- Drag all xcframeworks from the unzipped `addons.zip` into your project. Add them to **Frameworks, Libraries, and Embedded Content** with **Embed & Sign**.
+
+   If using XcodeGen, an `addons.yml` is included in `addons.zip` that you can include in your `project.yml`.
+
+Build and run.
 
 ## Quick Start
 
