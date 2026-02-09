@@ -54,7 +54,7 @@ let package = Package(
         // To update: run scripts/build-release.sh in pear-wrk-wdk-jsonrpc,
         // then paste the generated binary-targets.swift snippet below.
         // ---------------------------------------------------------------------
-        .binåaryTarget(
+        .binaryTarget(
             name: "bare_buffer",
             url: "https://github.com/claudiovb/pear-wrk-wdk-jsonrpc/releases/download/v1.0.0-beta.1/bare-buffer.xcframework.zip",
             checksum: "75431afc1cc8deb8eeda4eab3795c367834d4d36b9bd04bdf7811cde646a9c1b"
