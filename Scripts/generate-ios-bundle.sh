@@ -26,6 +26,10 @@ mkdir -p "$OUTPUT_DIR"
 echo "📋 Copying bundle..."
 cp generated/wdk-worklet.mobile.bundle "$OUTPUT_DIR/"
 
+# Convert ESM modules to CJS for JSC compatibility
+echo "🔄 Converting ESM→CJS for JSC..."
+node ../../Scripts/convert-bundle-esm-to-cjs.js "$OUTPUT_DIR/wdk-worklet.mobile.bundle" --in-place
+
 echo "📋 Copying frameworks..."
 cp -r ios-addons/*.xcframework "$OUTPUT_DIR/"
 

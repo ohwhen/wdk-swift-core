@@ -1,5 +1,8 @@
 console.log('wdk-worklet.js - JSON-RPC only version')
 
+// Force .mjs files to load as CJS (JSC has no js_create_module)
+module.constructor._extensions['.mjs'] = module.constructor._extensions['.js']
+
 // Internal dependencies
 const logger = require('./utils/logger')
 const { handlers, withErrorHandling } = require('./rpc-handlers')
